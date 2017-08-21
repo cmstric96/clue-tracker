@@ -12,6 +12,7 @@ allcards = per + wea + roo
 allcardsnc = per + wea + roo
 
 rumours = []
+poolcards = []
 
 class Player():
     def __init__(self, name):
@@ -83,6 +84,10 @@ def InfoSheet():
     print('Rumours:')
     for i in range(0, len(rumours)):
         print(rumours[i].rumour)
+    print()
+    print('Pool Cards:')
+    for i in range(0, len(poolcards)):
+        print(poolcards[i])
 
 def LogRumour():
     print('====================')
@@ -163,11 +168,35 @@ def LogRumour():
     if shown == '0':
         players[int(shownby)].rumoursa.append(rumour.rumour)
     if guest in players[int(playern)].cards and weapon in players[int(playern)].cards and shown == '0':
-        players[int(shownby)].cards.append(room)
+        rgw = room
     elif weapon in players[int(playern)].cards and room in players[int(playern)].cards and shown == '0':
-        players[int(shownby)].cards.append(guest)
+        rgw = guest
     elif guest in players[int(playern)].cards and room in players[int(playern)].cards and shown == '0':
-        players[int(shownby)].cards.append(weapon)
+        rgw = weapon
+    else:
+        rgw = ''
+    if playern == '0':
+        if guest not in players[0].cards and shown == '1':
+            if guest not in poolcards:
+                poolcards.append(guest)
+        if weapon not in players[0].cards and shown == '1':
+            if weapon not in poolcards:
+                poolcards.append(weapon)
+        if room not in players[0].cards and shown == '1':
+            if room not in poolcards:
+                poolcards.append(room)
+    else:
+        if guest not in allcards and guest not in players[int(playern)].cards and shown == '1':
+            if guest not in poolcards:
+                poolcards.append(guest)
+        if weapon not in allcards and weapon not in players[int(playern)].cards and shown =='1':
+            if weapon not in poolcards:
+                poolcards.append(weapon)
+        if room not in allcards and room not in players[int(playern)].cards and shown == '1':
+            if room not in poolcards:
+                poolcards.append(room)
+    if rgw not in players[int(shownby)].cards and rgw != '':
+        players[int(shownby)].cards.append(rgw)
 players = []
 playernum = 0
 while True:
@@ -237,8 +266,8 @@ while True:
 
 while True:
     if len(allcards) == 3:
-        print()
-        print('GO THE THE POOL. THE CARDS ARE: ' + allcards[1] + ', ' + allcards[2] + ', ' + allcards[3])
+        poolcards = allcards
+    if len(poolcards) == 3:
+        print('Go to the pool. Cards are: ' + poolcards[0] + ', ' + poolcards[1] + ', ' + poolcards[2])
         print()
     MainMenu()
-
