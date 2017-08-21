@@ -22,13 +22,13 @@ class Rumour():
     def __init__(self, p, g, w, r, s, sb):
         self.shown = s
         if self.shown == '0':
-            self.rumour = p + ' accused ' + g \
-                          + ' of killing someone with the ' + w \
+            self.rumour = p + ' started a rumour that ' + g \
+                          + ' killed someone with the ' + w \
                           + ' in the ' + r + ' and was shown a ' \
                           + 'card by ' + players[int(sb)].name
         else:
-            self.rumour = p + ' accused ' + g + \
-                          ' of killing someone with the ' + w + \
+            self.rumour = p + ' started the rumour that ' + g + \
+                          ' killed someone with the ' + w + \
                           ' in the ' + r
 
 def Error():
@@ -37,6 +37,7 @@ def Error():
     print()
 
 def MainMenu():
+    # Load initial menu screen
     print()
     print('===================')
     print('     Main Menu')
@@ -68,6 +69,7 @@ def YourCards():
     print(str(players[0].cards))
 
 def InfoSheet():
+    playern = 0
     print('===================')
     print('    Info Sheet')
     print('===================')
@@ -138,7 +140,6 @@ def LogRumour():
             cardnum += 1
         weapon = input('Weapon: ')
     weapon = wea[int(weapon)]
-    print()
     # Room in the rumour
     cardnum = 0
     for i in range(0, len(roo)):
@@ -221,13 +222,13 @@ def LogRumour():
             if room not in poolcards:
                 poolcards.append(room)
     else:
-        if guest not in allcards and guest not in players[int(playern)].cards and shown == '1':
+        if guest not in players[int(playern)].cards and shown == '1':
             if guest not in poolcards:
                 poolcards.append(guest)
-        if weapon not in allcards and weapon not in players[int(playern)].cards and shown =='1':
+        if weapon not in players[int(playern)].cards and shown == '1':
             if weapon not in poolcards:
                 poolcards.append(weapon)
-        if room not in allcards and room not in players[int(playern)].cards and shown == '1':
+        if room not in players[int(playern)].cards and shown == '1':
             if room not in poolcards:
                 poolcards.append(room)
     if rgw not in players[int(shownby)].cards and rgw != '':
@@ -248,13 +249,13 @@ def PlayerInfo():
         print(players[int(player)].cards[i])
     print('===========')
     print()
-    print('Accusations:')
+    print('Rumours Started:')
     print('============')
     for i in range(0, len(players[int(player)].rumoursd)):
         print(players[int(player)].rumoursd[i])
     print('============')
     print()
-    print('Accusations Answered:')
+    print('Rumours Answered:')
     print('=====================')
     for i in range(0, len(players[int(player)].rumoursa)):
         print(players[int(player)].rumoursa[i])
