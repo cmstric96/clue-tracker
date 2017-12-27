@@ -38,59 +38,39 @@ class Rumour():
 def MainLoop():
     global poolcards
     while True:
-        Save()
+        tempnum = 0
+        for i in range(0, len(per)):
+            if per[i] in allcards:
+                tempnum += 1
+        if tempnum == 1:
+            for i in range(0, len(per)):
+                if per[i] in allcards:
+                    poolcards.append(per[i])
+                    allcards.remove(per[i])
+        tempnum = 0
+        for i in range(0, len(wea)):
+            if wea[i] in allcards:
+                tempnum += 1
+        if tempnum == 1:
+            for i in range(0, len(wea)):
+                if wea[i] in allcards:
+                    poolcards.append(wea[i])
+                    allcards.remove(wea[i])
+        tempnum = 0
+        for i in range(0, len(roo)):
+            if roo[i] in allcards:
+                tempnum += 1
+        if tempnum == 1:
+            for i in range(0, len(roo)):
+                if roo[i] in allcards:
+                    poolcards.append(roo[i])
+                    allcards.remove(roo[i])
         if len(allcards) == 3:
             poolcards = allcards
         if len(poolcards) == 3:
             print()
             print('Go to the pool. Cards are: ' + poolcards[0] + ', ' + poolcards[1] + ', ' + poolcards[2])
         MainMenu()
-
-def Save():
-    with open('ClueSaves.txt', 'w') as file:
-        for i in range(0, len(players)):
-            file.write('Player:' + players[i].name + '\n')
-            for j in range(0, len(players[i].cards)):
-                file.write('Card:' + players[i].cards[j] + '\n')
-        for i in range(0, len(notowned)):
-            file.write('Not Owned:' + notowned[i] + '\n')
-        for i in range(0, len(poolcards)):
-            file.write('Pool Card:' + poolcards[i] + '\n')
-        for i in range(0, len(rumours)):
-            file.write('Rumour:' + rumours[i].rumour + '\n')
-
-def Load():
-    print('Loading...')
-    with open('ClueSaves.txt') as file:
-        for line in file:
-            line = line.strip('\n')
-            line = line.split(':')
-            player = -1
-            if line[0] == 'Player':
-                player = player + 1
-                loadedplayer = Player(line[1])
-                players.append(loadedplayer)
-            elif line[0] == 'Card':
-                players[player].cards.append(line[1])
-                allcards.remove(line[1])
-            elif line[0] == 'Not Owned':
-                notowned.append(line[1])
-                allcards.remove(line[1])
-            elif line[0] == 'Pool Card':
-                poolcards.append(line[1])
-            elif line[0] == 'Rumour':
-                line1 = line[1]
-                line1 = line1.split(' ')
-                shown = '1'
-                sb = '0'
-                if len(line1) > 14:
-                    shown = '0'
-                    sb = str(players.index(line1[20]))
-                loadedrumour = Rumour(line1[0], line1[5], line1[10], line1[13], shown, sb)
-                rumours.append(loadedrumour)
-
-    print('Loaded')
-    MainLoop()
                 
 def Error():
     print()
@@ -98,11 +78,21 @@ def Error():
     print()
 
 def AddCards():
-    for i in range(0, len(allcards)):
-        print(str(i) + ': ' + allcards[i])
-    addingcard = input('Card: ')
-    notowned.append(allcards[int(addingcard)])
-    allcards.remove(allcards[int(addingcard)])
+    try:
+        for i in range(0, len(players)):
+            print(str(i) + ': ' + players[i].name)
+        print(str(len(players)) + ': Free card')
+        addingplayer = input('Player: ')
+        for i in range(0, len(allcards)):
+            print(str(i) + ': ' + allcards[i])
+        addingcard = input('Card: ')
+        if int(addingplayer) == len(players):
+            notowned.append(allcards[int(addingcard)])
+        else:
+            players[int(addingplayer)].cards.append(allcards[int(addingcard)])
+        allcards.remove(allcards[int(addingcard)])
+    except:
+        MainLoop()
     
     
 def MainMenu():
@@ -118,6 +108,7 @@ def MainMenu():
     print('2: Log rumour')
     print('3: Player info')
     print('4: Eliminate card')
+    print('5: Make pool card')
     action = input('Action: ')
     print()
     if action == '0':
@@ -130,6 +121,8 @@ def MainMenu():
         PlayerInfo()
     elif action == '4':
         AddCards()
+    elif action == '5':
+        PoolizeCard()
     else:
         Error()
 
@@ -154,6 +147,8 @@ def InfoSheet():
                 break
             elif allcardsnc[i] in notowned:
                 owner = 'Free Card'
+            elif allcardsnc[i] in poolcards:
+                owner = 'Pool Card'
             else:
                 owner = ''
         print(str(i) + ': ' + allcardsnc[i] + ' - ' + owner)
@@ -167,6 +162,7 @@ def InfoSheet():
         print(poolcards[i])
 
 def LogRumour():
+    numcardsbefore = len(players[0].cards)
     print('====================')
     print('     Log Rumour')
     print('====================')
@@ -280,28 +276,34 @@ def LogRumour():
     submit = input('Are you sure you want to go through with this rumour? ')
     if submit == '1':
         MainMenu()
-    # Analize rumour
-    if shown == '0':
-        players[int(shownby)].rumoursa.append(rumour.rumour)
-    if guest in players[int(playern)].cards and weapon in players[int(playern)].cards and shown == '0':
-        rgw = room
-    elif weapon in players[int(playern)].cards and room in players[int(playern)].cards and shown == '0':
-        rgw = guest
-    elif guest in players[int(playern)].cards and room not in players[int(playern)].cards and shown == '0':
-        rgw = weapon
-    else:
-        rgw = ''
-    if guest not in allcards and weapon not in allcards and shown == '1':
-        if room not in poolcards:
-            poolcards.append(room)
-    elif weapon not in allcards and room not in allcards and shown == '1':
-        if guest not in poolcards:
-            poolcards.append(guest)
-    elif guest not in allcards and room not in allcards and shown == '1':
-        if weapon not in poolcards:
-            poolcards.append(weapon)
-    if rgw not in players[int(shownby)].cards and rgw != '':
-        players[int(shownby)].cards.append(rgw)
+    # Analyze rumour
+    if len(players[0].cards) == numcardsbefore:
+        if shown == '0':
+            players[int(shownby)].rumoursa.append(rumour.rumour)
+        if guest in players[int(playern)].cards and weapon in players[int(playern)].cards and shown == '0':
+            rgw = room
+        elif weapon in players[int(playern)].cards and room in players[int(playern)].cards and shown == '0':
+            rgw = guest
+        elif guest in players[int(playern)].cards and room not in players[int(playern)].cards and shown == '0':
+            rgw = weapon
+        else:
+            rgw = ''
+    ##    for i in range(0, len(rumours)):
+    ##        if 
+        if guest not in allcards and weapon not in allcards and shown == '1':
+            if room not in poolcards:
+                poolcards.append(room)
+                allcards.remove(room)
+        elif weapon not in allcards and room not in allcards and shown == '1':
+            if guest not in poolcards:
+                poolcards.append(guest)
+                allcards.remove(guest)
+        elif guest not in allcards and room not in allcards and shown == '1':
+            if weapon not in poolcards:
+                poolcards.append(weapon)
+                allcards.remove(weapon)
+        if rgw not in players[int(shownby)].cards and rgw != '':
+            players[int(shownby)].cards.append(rgw)
 
 def PlayerInfo():
     print('=====================')
@@ -330,13 +332,12 @@ def PlayerInfo():
         print(players[int(player)].rumoursa[i])
     print('=====================')
 
-# Main program
-# Get players
-print('0: Yes')
-print('1: No')
-loadq = input('Would you like to load from a save file? ')
-if loadq == '0':
-    Load()
+def PoolizeCard():
+    for i in range(0, len(allcards)):
+        print(str(i) + ': ' + allcards[i])
+    poolizingcard = input('Card: ')
+    poolcards.append(allcards[int(poolizingcard)])
+    allcards.remove(allcards[int(poolizingcard)])
 
 print('===========================================')
 print('             Enter player name')
