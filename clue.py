@@ -24,6 +24,11 @@ class Player():
 class Rumour():
     def __init__(self, p, g, w, r, s, sb):
         self.shown = s
+        self.person = p
+        self.guest = g
+        self.weapon = w
+        self.room = r
+        self.shownby = sb
         if self.shown == '0':
             self.rumour = p + ' started a rumour that ' + g \
                           + ' killed someone with the ' + w \
@@ -109,23 +114,28 @@ def MainMenu():
     print('3: Player info')
     print('4: Eliminate card')
     print('5: Make pool card')
+    print('6: Card Statistics')
     action = input('Action: ')
     print()
-    if action == '0':
-        YourCards()
-    elif action == '1':
-        InfoSheet()
-    elif action == '2':
-        LogRumour()
-    elif action == '3':
-        PlayerInfo()
-    elif action == '4':
-        AddCards()
-    elif action == '5':
-        PoolizeCard()
-    else:
+    try:
+        if action == '0':
+            YourCards()
+        elif action == '1':
+            InfoSheet()
+        elif action == '2':
+            LogRumour()
+        elif action == '3':
+            PlayerInfo()
+        elif action == '4':
+            AddCards()
+        elif action == '5':
+            PoolizeCard()
+        elif action == '6':
+            PrintStatistics()
+        else:
+            Error()
+    except:
         Error()
-
 def YourCards():
     print('====================')
     print('     Your Cards')
@@ -141,16 +151,28 @@ def InfoSheet():
     print()
     print('Cards:')
     for i in range(0, len(allcardsnc)):
+        if i == 0:
+            print('')
+            print('Guests')
+            print('===================')
+        elif i == 6:
+            print('')
+            print('Weapons')
+            print('===================')
+        elif i == 15:
+            print('')
+            print('Rooms')
+            print('===================')
         for k in range(0, len(players)):
-            if allcardsnc[i] in players[k].cards:
-                owner = players[k].name
-                break
-            elif allcardsnc[i] in notowned:
-                owner = 'Free Card'
-            elif allcardsnc[i] in poolcards:
-                owner = 'Pool Card'
-            else:
-                owner = ''
+                if allcardsnc[i] in players[k].cards:
+                    owner = players[k].name
+                    break
+                elif allcardsnc[i] in notowned:
+                    owner = 'Free Card'
+                elif allcardsnc[i] in poolcards:
+                    owner = 'Pool Card'
+                else:
+                    owner = ''
         print(str(i) + ': ' + allcardsnc[i] + ' - ' + owner)
     print()
     print('Rumours:')
@@ -160,6 +182,57 @@ def InfoSheet():
     print('Pool Cards:')
     for i in range(0, len(poolcards)):
         print(poolcards[i])
+
+def PrintStatistics():
+    print('====================')
+    print('     Card Statistics')
+    print('====================')
+    print('0: Guests')
+    print('1: Weapons')
+    print('2: Rooms')
+    print('3: All Cards')
+    action = input('Action: ')
+    print()
+    print('Card       |Owner      |Rumours    |Probs      |')
+    print('-----------|-----------|-----------|-----------|')
+    for i in range(0, len(allcardsnc)):
+        Rumour = 0
+        if allcardsnc[i] in per:
+            Rumour = sum(p.guest == allcardsnc[i] and p.shown == '0' for p in rumours)
+        elif allcardsnc[i] in wea:
+            Rumour = sum(p.weapon == allcardsnc[i] and p.shown == '0' for p in rumours)
+        elif allcardsnc[i] in roo:
+            Rumour = sum(p.room == allcardsnc[i] and p.shown == '0' for p in rumours)
+        for k in range(0, len(players)):
+            if allcardsnc[i] in players[k].cards:
+                owner = players[k].name
+                Prob = 0
+                break
+            elif allcardsnc[i] in poolcards:
+                owner = 'Pool Card'
+                Prob = 1
+            else:
+                owner = ''
+                if allcardsnc[i] in per:
+                    Prob = round(1/(sum(el in per for el in allcards)),5)
+                elif allcardsnc[i] in wea:
+                    Prob = round(1/(sum(el in wea for el in allcards)),5)
+                elif allcardsnc[i] in roo:
+                    Prob = round(1/(sum(el in roo for el in allcards)),5)
+        #print(f'{allcardsnc[i]:11}|{owner:11}|{Rumour:11}|{Prob:11}|')
+        if action == '0':
+            if allcardsnc[i] in per:
+                print(f'{allcardsnc[i]:11}|{owner:11}|{Rumour:11}|{Prob:11}|')
+        elif action == '1':
+            if allcardsnc[i] in wea:
+                print(f'{allcardsnc[i]:11}|{owner:11}|{Rumour:11}|{Prob:11}|')
+        elif action == '2':
+            if allcardsnc[i] in roo:
+                print(f'{allcardsnc[i]:11}|{owner:11}|{Rumour:11}|{Prob:11}|')
+        elif action == '3':
+            print(f'{allcardsnc[i]:11}|{owner:11}|{Rumour:11}|{Prob:11}|')
+        else:
+            error()
 
 def LogRumour():
     numcardsbefore = len(players[0].cards)
@@ -316,8 +389,21 @@ def PlayerInfo():
     print()
     print('Cards:')
     print('===========')
+    print('Guests')
+    print('------------')
     for i in range(0, len(players[int(player)].cards)):
-        print(players[int(player)].cards[i])
+        if(players[int(player)].cards[i]) in per:
+            print(players[int(player)].cards[i])
+    print('Weapons')
+    print('------------')
+    for i in range(0, len(players[int(player)].cards)):
+        if(players[int(player)].cards[i]) in wea:
+            print(players[int(player)].cards[i])
+    print('Rooms')
+    print('------------')
+    for i in range(0, len(players[int(player)].cards)):
+        if(players[int(player)].cards[i]) in roo:
+            print(players[int(player)].cards[i])  
     print('===========')
     print()
     print('Rumours Started:')
